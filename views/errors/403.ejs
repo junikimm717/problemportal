@@ -20,6 +20,8 @@
 			<h1>403 Forbidden</h1>
 			<%if (locals.tampered) {%>
 			<p>CSRF Token was invalid.</p>
+			<%} else if (locals.message) {%>
+			<p><%=locals.message%></p>
 			<%} else {%>
 			<p>You either don't have permissions or need to log in</p>
 			<%}%>

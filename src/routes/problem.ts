@@ -95,7 +95,20 @@ export const Owner: express.Handler = (req: ProblemSetRequest, res, next) => {
 
 router.use('/create', Admin);
 
-router.get('/create/:num(\\d+)', loggedIn, (req, res) => {
+const limit: express.RequestHandler = (req, res, next) => {
+	const num = parseInt(req.params.num);
+	if (isNaN(num)) {
+		error(req, res, 400);
+		return;
+	}
+	if (num <= 0 || num > 100) {
+		render(req, res.status(403), 'errors/403', {
+			message:
+				'The number of problems must be between 1 and 100 (security measure)',
+		});
+	}
+};
+router.get('/create/:num(\\d+)', loggedIn, limit, (req, res) => {
 	render(req, res, 'pages/create', {
 		number: req.params.num,
 		csrfToken: req.csrfToken(),
@@ -105,6 +118,7 @@ router.get('/create/:num(\\d+)', loggedIn, (req, res) => {
 router.post(
 	'/create/:num(\\d+)',
 	loggedIn,
+	limit,
 	validateProblemSet,
 	async (req: ProblemSetRequest, res) => {
 		let uuid = undefined;
