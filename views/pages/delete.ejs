@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<%- include('../shared/head') %>
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+			integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+			crossorigin="anonymous"
+		/>
+		<script
+			src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+			integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+			crossorigin="anonymous"
+		></script>
+
+		<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+	</head>
+	<body>
+		<%- include('../shared/navbar')%>
+		<div class="container-fluid m-3 p-2">
+			<form action="#" method="post" id="deleteform">
+				<h2 class="text-danger">Deleting is an irreversible action!</h2>
+				<p>
+					Please put in the name of the problem set verbatim in order to delete
+					it
+				</p>
+
+				<br />
+				<p><%= name %></p>
+				<input type="hidden" name="_csrf" value="<%=csrfToken%>" />
+				<input type="text" v-model="text" class="form-text" />
+				<button class="btn btn-outline-danger my-1 text-center" v-if="valid">
+					Delete
+				</button>
+			</form>
+		</div>
+		<footer class="container-fluid text-center text-muted">
+			<%- include('../shared/footer')%>
+		</footer>
+	</body>
+	<script>
+		const name = '<%= name %>';
+		const app = new Vue({
+			el: '#deleteform',
+			data: {
+				text: '',
+			},
+			computed: {
+				valid: function () {
+					return this.text === name;
+				},
+			},
+		});
+	</script>
+</html>

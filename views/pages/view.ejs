@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<%- include('../shared/head') %>
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+			integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+			crossorigin="anonymous"
+		/>
+		<script
+			src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+			integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+			crossorigin="anonymous"
+		></script>
+		<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+		<!--Katex-->
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css"
+			integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs"
+			crossorigin="anonymous"
+		/>
+		<script
+			src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js"
+			integrity="sha384-z1fJDqw8ZApjGO3/unPWUPsIymfsJmyrDVWC8Tv/a1HeOtGmkwNd/7xUS0Xcnvsx"
+			crossorigin="anonymous"
+		></script>
+		<script src="/static/latex_utils.js"></script>
+	</head>
+	<body>
+		<%- include('../shared/navbar')%>
+		<div class="container m-3 p-2">
+			<form id="answers" action="#" method="post">
+				<h1>
+					<%= name %> (<span class="text-success">{{ score }}</span
+					>)
+				</h1>
+				<p class="text-muted">by <%=by%></p>
+				<input type="hidden" name="_csrf" value="<%=csrfToken%>" />
+				<p class="text-danger">
+					*All answer fields must either have a capital letter between A and E
+					or be an integer.
+				</p>
+
+				<br />
+
+				<div class="m-2 p-1" v-for="i in problemnums" :key="i">
+					<h2>Problem {{ i + 1 }}</h2>
+					<div
+						class="form-label"
+						v-if="latex[i].length !== 0"
+						v-html="latex[i]"
+					></div>
+					<br />
+					<label class="form-label"> Answer </label> <br />
+					<input
+						type="text"
+						v-model="answers[i]"
+						class="form-text"
+						v-bind:name="'answer_' + i"
+					/>
+					<span class="text-success" v-if="correct[i]"> Correct! </span>
+					<span class="text-danger" v-if="!correct[i]">
+						Incorrect/Missing
+					</span>
+					<br />
+				</div>
+				<button class="btn btn-outline-primary my-1">Check</button>
+			</form>
+		</div>
+		<footer class="container-fluid text-center text-muted">
+			<%- include('../shared/footer')%>
+		</footer>
+	</body>
+
+	<script>
+		const statements = <%- JSON.stringify(statements)%>;
+		const number = statements.length;
+		const correct = <%- JSON.stringify(locals.correct || Array.from({length:statements.length}).fill(null)) %>;
+		const score = "" + correct.filter(x => x).length + "/" + correct.length;
+
+		const answers = <%- JSON.stringify(locals.response || Array.from({length:statements.length}).fill("")) %>;
+
+		const answerre = /^\s*([A-E]|[0-9]+)\s*$/
+		const app = new Vue({
+			el: "#answers",
+			data: {
+				problemtext: statements,
+				correct,
+				answers,
+				problemnums: Array.from({length: number}).fill(0).map((_, i) => i),
+				score
+			},
+			computed: {
+				latex: function () {
+					if (!this.problemtext) {
+						return Array(number).fill("");
+					} else {
+						//const render = x => katex.renderToString(x, {throwOnError: false, displayMode: true});
+						return this.problemtext.map(x => render(x))
+					}
+				},
+				valid: function() {
+					return this.answers.every(x => answerre.test(x))
+				}
+			}
+		});
+	</script>
+</html>

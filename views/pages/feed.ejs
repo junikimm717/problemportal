@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<%- include('../shared/head') %>
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+			integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+			crossorigin="anonymous"
+		/>
+		<script
+			src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+			integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+			crossorigin="anonymous"
+		></script>
+
+		<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+		<script
+			src="https://cdn.socket.io/4.4.0/socket.io.min.js"
+			integrity="sha384-1fOn6VtTq3PWwfsOrk45LnYcGosJwzMHv+Xh/Jx5303FVOXzEnw0EpLv30mtjmlj"
+			crossorigin="anonymous"
+		></script>
+	</head>
+	<body>
+		<%- include('../shared/navbar')%>
+		<div class="container-fluid m-3 p-2">
+			<h1>Feed for "<%= name %>"</h1>
+			<div id="feed" class="my-4 overflow-scroll h-50">
+				<h5 class="rounded-2 bg-light m-2 p-2" v-for="notif in notifs">
+					<span class="my-2">
+						{{ notif.name }} sent a response at {{ notif.date }} <br />
+					</span>
+					<div class="my-2">
+						<span v-for="res in notif.responses" class="m-1 p-1">
+							{{ res.index + 1 }}. &nbsp;
+							<span v-bind:class="res.className">
+								{{ res.response }}
+							</span>
+						</span>
+					</div>
+				</h5>
+			</div>
+		</div>
+		<footer class="container-fluid text-center text-muted">
+			<%- include('../shared/footer')%>
+		</footer>
+	</body>
+	<script>
+		const uuid = "<%= uuid %>";
+		// initial feed of documents
+		const init = <%- JSON.stringify(init) %>;
+		const socket = io("", {query: { uuid }});
+		console.log(socket.rooms);
+
+		const app = new Vue({
+			el: "#feed",
+			data: {
+				notifications: init,
+			},
+			methods: {
+				add(doc) {
+					this.notifications.unshift(doc);
+				}
+			},
+			computed: {
+				notifs: function() {
+					return this.notifications.map(notif => {
+						const ar = [];
+						for (let i = 0; i < notif.response.length; i++) {
+							const className = (notif.correct[i] ? 'bg-success' : 'bg-danger') + ' ' + 'p-1 text-white rounded-2'
+							ar.push({response: notif.response[i] || 'none', correct: notif.correct[i], className, index: i});
+						}
+						const d = new Date(notif.updatedAt);
+						return {
+							responses: ar,
+							date: d.toLocaleDateString('en-us') + ' ' + d.toLocaleTimeString('en-us'),
+							name: notif.username
+						}
+					})
+				}
+			}
+		});
+
+		socket.on('response', body => {
+			console.log('happens', body);
+			app.add(body);
+		})
+	</script>
+</html>

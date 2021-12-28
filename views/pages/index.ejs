@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<%- include('../shared/head') %>
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+			integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+			crossorigin="anonymous"
+		/>
+		<script
+			src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+			integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+			crossorigin="anonymous"
+		></script>
+	</head>
+	<body>
+		<%- include('../shared/navbar')%>
+		<div class="container-fluid m-3 p-2">
+			<%if (config.quote){%>
+			<h1 class="text-center"><%=config.quote.text%></h1>
+			<p class="text-center text-muted">- <%=config.quote.by%></p>
+			<%} else if (config.title){%>
+			<h1 class="text-center"><%=config.title%></h1>
+			<%}%>
+
+			<div class="row m-2 p-3 bg-light text-center">
+				<h3 class="col">Live Viewing</h3>
+				<p class="col">
+					Problem sets are distributed with a single link. Students' submissions
+					come up in the submission feed immediately after each attempt.
+				</p>
+			</div>
+			<div class="row m-2 p-3 bg-light text-center">
+				<h3 class="col">Auto Grading</h3>
+				<p class="col">
+					Just like <a href="https://maatester.com">maatester.com</a>. No more
+					manual grading. Students can receive immediate feedback.
+				</p>
+			</div>
+			<div class="row m-2 p-3 bg-light text-center">
+				<h3 class="col">Full Latex Support</h3>
+				<p class="col">
+					Using KaTeX, the fastest latex typesetting library. Problem sets can
+					be created effortlessly.
+				</p>
+			</div>
+			<%if (user) {%>
+			<div class="row m-2 p-3 text-center">
+				<a href="/dashboard"><h3>Dashboard</h3></a>
+			</div>
+			<%}%>
+		</div>
+		<footer class="container-fluid text-center text-muted">
+			<%- include('../shared/footer')%>
+		</footer>
+	</body>
+</html>
