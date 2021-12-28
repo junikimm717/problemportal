@@ -107,6 +107,7 @@ const limit: express.RequestHandler = (req, res, next) => {
 				'The number of problems must be between 1 and 100 (security measure)',
 		});
 	}
+	next();
 };
 router.get('/create/:num(\\d+)', loggedIn, limit, (req, res) => {
 	render(req, res, 'pages/create', {
